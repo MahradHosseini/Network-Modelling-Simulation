@@ -26,3 +26,10 @@ def mmc_queue_analytics():
 
     # average waiting time
     w = w_queue + (1 / mhu)
+
+    return {
+        'Utilization (ρ)': p,
+        'Mean queue length': l_queue,
+        'Average Response Time in the System (W)': w,
+        'Average Waiting Time in the Queue (Wq)': w_queue
+    }
