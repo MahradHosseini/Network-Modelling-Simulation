@@ -9,7 +9,7 @@ def mmc_queue_analytics():
     p = lambda_rate / (c * mhu)
 
     # P_0
-    val = 0;
+    val = 0
     for m in range(c - 1):
         a = ((c * p) ** m) / math.factorial(m)
         b = ((c * p) ** c) / (math.factorial(c) * (1 - p))
@@ -21,7 +21,7 @@ def mmc_queue_analytics():
     l_queue = (p_0 * ((lambda_rate / mhu) ** c) * p) / (math.factorial(c) * ((1 - p) ** 2))
 
     # average waiting time for queue
-    W_queue = l_queue / lambda_rate
+    w_queue = l_queue / lambda_rate
 
     # average waiting time
-    W = W_queue + (1 / mhu)
+    w = w_queue + (1 / mhu)
