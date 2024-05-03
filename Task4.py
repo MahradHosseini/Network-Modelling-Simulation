@@ -6,9 +6,10 @@ def mmc_queue_analytics():
     lambda_rate = 2
     mhu = 1  # µ mhu: mean service rate = 1 / E[Service - Time]
 
+    # traffic intensity
     p = lambda_rate / (c * mhu)
 
-    # P_0
+    # p_0 probability system (queue + servers) is empty
     val = 0
     for m in range(c - 1):
         a = ((c * p) ** m) / math.factorial(m)
