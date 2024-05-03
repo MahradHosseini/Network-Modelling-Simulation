@@ -9,10 +9,9 @@ wait, the utilisation, and the mean queue length.
 '''
 
 
-def mmc_queue_analytics():
+def mmc_queue_analytics(lambda_rate, mhu):
     c = 1  # c: number of servers in parallel
-    lambda_rate = 2
-    mhu = 1  # µ mhu: mean service rate = 1 / E[Service - Time]
+    # µ mhu: mean service rate = 1 / E[Service - Time]
 
     # traffic intensity
     p = lambda_rate / (c * mhu)
