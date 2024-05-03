@@ -10,7 +10,7 @@ wait, the utilisation, and the mean queue length.
 
 
 def mmc_queue_analytics(lambda_rate, mhu):
-    c = 1  # c: number of servers in parallel
+    c = 1 # c: number of servers in parallel
     # µ mhu: mean service rate = 1 / E[Service - Time]
 
     # traffic intensity
@@ -21,8 +21,8 @@ def mmc_queue_analytics(lambda_rate, mhu):
     for m in range(c):
         a = ((c * p) ** m) / math.factorial(m)
         b = ((c * p) ** c) / (math.factorial(c) * (1 - p))
-        c = a + b
-        val += c
+        d = a + b
+        val += d
     p_0 = 1 / val
 
     # Lq: mean number of customers in the queue
@@ -40,3 +40,12 @@ def mmc_queue_analytics(lambda_rate, mhu):
         'Average Response Time in the System (W)': w,
         'Average Waiting Time in the Queue (Wq)': w_queue
     }
+
+
+if __name__ == '__main__':
+    # Rates are as Customer per Unit Time
+    lambda_input, mu_rate = 0.8, 1.0
+    analytics = mmc_queue_analytics(lambda_input, mu_rate)
+
+    for key, value in analytics.items():
+        print(f'{key}: {value:.2f}')
