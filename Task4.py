@@ -1,5 +1,13 @@
 import math
 
+'''
+Write a program (in C, C++, Java, Python or C#) to simulate an M/M/c queuing system
+(Poisson arrivals, exponentially distributed service times and single server). Assume a
+quasi-birth and death model with state-independent arrival and service rates λ and µ,
+respectively. Compute the average waiting time, the average waiting time of those who
+wait, the utilisation, and the mean queue length.
+'''
+
 
 def mmc_queue_analytics():
     c = 1  # c: number of servers in parallel
@@ -11,7 +19,7 @@ def mmc_queue_analytics():
 
     # p_0 probability system (queue + servers) is empty
     val = 0
-    for m in range(c - 1):
+    for m in range(c):
         a = ((c * p) ** m) / math.factorial(m)
         b = ((c * p) ** c) / (math.factorial(c) * (1 - p))
         c = a + b
