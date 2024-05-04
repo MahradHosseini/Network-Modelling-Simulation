@@ -85,12 +85,6 @@ class MMCSimulation:
 
         # average waiting time
         self.w = self.w_queue + (1 / self.mhu)
-        return {
-            'Utilization (ρ)': self.rho,
-            'Mean queue length': self.l_queue,
-            'Average Response Time in the System (W)': self.w,
-            'Average Waiting Time in the Queue (Wq)': self.w_queue
-        }
 
 
 lambda_rate = 0.8
