@@ -43,7 +43,7 @@ class MMCSimulation:
         self.clock = 0
         self.generate_arrival_time()  # generate arrivals
         self.generate_service_time()
-        while self.clock < self.time_limit and len(self.arrivals) !=0:
+        while self.clock < self.time_limit and len(self.arrivals) != 0:
             if len(self.servers) == self.c:
                 self.clock = min(self.servers)
                 self.servers.remove(min(self.servers))
@@ -91,7 +91,3 @@ print("Utilization (ρ)", simulation.rho)
 print("Mean queue length", simulation.l_queue)
 print("Average Response Time in the System (W):", simulation.w)
 print("Average waiting time for queue:", simulation.w_queue)
-
-
-
-
