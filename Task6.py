@@ -83,17 +83,17 @@ class MMCSimulationServerFailureTask:
 
             print("time is: ", self.clock)
 
-            # finding next event
             next_event_time = min(arrival_time, server_failure_time, repair_time, freed_server_time)
-            print(arrival_time, server_failure_time, repair_time, freed_server_time)
-            if self.clock <= next_event_time:
+            if len(self.usable_servers )!= 0:
                 self.clock = next_event_time
-                print("clock smaller than event time: ", self.clock)
+                print("arrival, server failure, repair and free server time: ",arrival_time, server_failure_time, repair_time, freed_server_time)
             else:
+                self.clock = min(repair_time, freed_server_time, server_failure_time)
+                print(repair_time, freed_server_time, server_failure_time)
                 time_flag = True
 
             # time is now at next event
-            if self.clock == arrival_time or time_flag is True:  # if time is next_arrival
+            if self.clock == arrival_time:  # if time is next_arrival
                 print("in arrival")
                 if len(self.usable_servers) == 0:  # if no usable servers pass
                     print("no usable servers")
@@ -164,7 +164,7 @@ class MMCSimulationServerFailureTask:
                 self.in_process_arrivals = [arrival for arrival in self.in_process_arrivals if arrival['server_id'] !=
                                             arrival_server_id]
                 print(self.in_process_arrivals)
-            print()
+            '''print()
             print("new arrival with id: ", next_arrival['id'])
             print("server id: ", next_arrival['server_id'])
             print("service time: ", next_arrival['service'])
@@ -173,7 +173,7 @@ class MMCSimulationServerFailureTask:
             print("server repair time: ", server['repair_time'])
             print()
             print("are servers full?", len(self.usable_servers) == 0)
-            print("next arrival time: ", self.arrivals[0])
+            print("next arrival time: ", self.arrivals[0])'''
 
         self.calculations()
 
