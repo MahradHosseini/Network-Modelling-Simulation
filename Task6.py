@@ -64,7 +64,7 @@ class MMCSimulationServerFailureTask:
         self.clock = 0                              # reset clock
         time_flag = False
         self.arrivals.pop(0)
-        print(self.arrivals)
+        # print(self.arrivals)
 
         while self.clock < self.time_limit and (len(self.arrivals) != 0 or len(self.busy_servers) != 0):
             time_flag = False
@@ -86,15 +86,15 @@ class MMCSimulationServerFailureTask:
             next_event_time = min(arrival_time, server_failure_time, repair_time, freed_server_time)
             if len(self.usable_servers )!= 0:
                 self.clock = next_event_time
-                print("arrival, server failure, repair and free server time: ",arrival_time, server_failure_time, repair_time, freed_server_time)
+                # print("arrival, server failure, repair and free server time: ",arrival_time, server_failure_time, repair_time, freed_server_time)
             else:
                 self.clock = min(repair_time, freed_server_time, server_failure_time)
-                print(repair_time, freed_server_time, server_failure_time)
+                # print(repair_time, freed_server_time, server_failure_time)
                 time_flag = True
 
             # time is now at next event
             if self.clock == arrival_time:  # if time is next_arrival
-                print("in arrival")
+                # print("in arrival")
                 if len(self.usable_servers) == 0:  # if no usable servers pass
                     print("no usable servers")
                     self.clock = min(repair_time, freed_server_time, server_failure_time)
@@ -110,8 +110,8 @@ class MMCSimulationServerFailureTask:
                     arrival['service'] = self.generate_service_time() + self.clock  # generated arrival service time
                     arrival['server_id'] = server['id']  # arrival's server id = server's
                     self.in_process_arrivals.append(arrival)  # append to in_process_arrivals
-                if len(self.usable_servers) == 0:
-                    print("server's freeing time: ", self.busy_servers[0]," ",self.busy_servers[1])
+                # if len(self.usable_servers) == 0:
+                    # print("server's freeing time: ", self.busy_servers[0]," ",self.busy_servers[1])
 
             elif self.clock == next_failure_server['free_operation_time']:  # if clock is freeOp time
                 print("in next failure server")
@@ -159,11 +159,11 @@ class MMCSimulationServerFailureTask:
                 matching_server['free_operation_time'] -= self.clock
                 self.usable_servers.append(matching_server)
 
-                print("must deleted process server id: ", arrival_server_id)
+                # print("must deleted process server id: ", arrival_server_id)
 
                 self.in_process_arrivals = [arrival for arrival in self.in_process_arrivals if arrival['server_id'] !=
                                             arrival_server_id]
-                print(self.in_process_arrivals)
+                # print(self.in_process_arrivals)
             '''print()
             print("new arrival with id: ", next_arrival['id'])
             print("server id: ", next_arrival['server_id'])
