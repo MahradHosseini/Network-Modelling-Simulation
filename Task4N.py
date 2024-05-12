@@ -17,9 +17,9 @@ class MMCSimulation:
         self.c = c_in  # num of servers
         self.time_limit = time_limit_in  # how long sim should take
         self.clock = None  # real time
-        self.services = []
-        self.servers = []
-        self.arrivals = []
+        self.services = []  # service times
+        self.servers = []   # servers
+        self.arrivals = []  # arrival times
         self.start = None
         self.rho = None
         self.p_0 = None
@@ -40,20 +40,22 @@ class MMCSimulation:
             self.clock = arrival_time
 
     def run_simulation(self):
-        self.clock = 0
+        self.clock = 0  # clock is 0
         self.generate_arrival_time()  # generate arrivals
-        self.generate_service_time()
-        while self.clock < self.time_limit and len(self.arrivals) != 0:
-            if len(self.servers) == self.c:
-                self.clock = min(self.servers)
-                self.servers.remove(min(self.servers))
-            else:
-                self.clock += self.arrivals[0]
-            service_time = self.services[0]
-            departure_time = self.clock + service_time
-            self.servers.append(departure_time)
-            self.services.remove(service_time)
+        self.generate_service_time()  # generate service times
 
+        while self.clock < self.time_limit and (len(self.arrivals) != 0 or len(self.servers) != 0):
+            if len(self.servers) == self.c:                                 # if servers are busy
+                self.clock = min(self.servers)                                  # time is when it is free
+                self.servers.remove(min(self.servers))                          # remove server from busy
+            else:                                                           # if there are free servers
+                if self.clock <= self.arrivals[0]:                              # if the time is before the arrival
+                    self.clock = self.arrivals.pop(0)                           # make it new arrival's
+                else:                                                       # if time is equal or later than the arrival
+                    self.arrivals.pop(0)                                        # just pop and do not touch time
+                service_time = self.services.pop(0)                         # service time is taken
+                departure_time = self.clock + service_time                  # departure is clock + service
+                self.servers.append(departure_time)                         # append to servers
         self.calculations()
 
     def calculations(self):
