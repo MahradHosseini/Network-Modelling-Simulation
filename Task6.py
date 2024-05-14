@@ -12,6 +12,7 @@ class MMCSimulationServerFailureTask:
         self.c = c_in  # num of servers
         self.time_limit = time_limit_in  # how long sim should take
         self.clock = None  # real time
+        self.temp_time = None
         self.ksi = ksi_in  # mean breakdown rate
         self.eta = eta_in  # mean repair rate
         self.rho = None
@@ -83,11 +84,18 @@ class MMCSimulationServerFailureTask:
 
             next_event_time = min(arrival_time, server_failure_time, repair_time, freed_server_time)
             if len(self.usable_servers )!= 0:
-                self.clock = next_event_time
+                print("clock before: ", self.clock)
+                if self.clock > next_event_time:
+                    self.temp_time = next_event_time
+                else:
+                    self.clock = next_event_time
+                print("clock after: ", self.clock)
             else:
+                print("clock before: ", self.clock)
                 self.clock = min(repair_time, freed_server_time, server_failure_time)
+                print("clock after: ", self.clock)
 
-            if self.clock == arrival_time:                      # if time is next_arrival
+            if self.clock == arrival_time or self.temp_time == arrival_time:        # if time is next_arrival
                 if len(self.usable_servers) == 0:               # if no usable servers pass
                     print("no usable servers")
                     self.clock = min(repair_time, freed_server_time, server_failure_time)
@@ -104,7 +112,8 @@ class MMCSimulationServerFailureTask:
                     arrival['server_id'] = server['id']         # arrival's server id = server's
                     self.in_process_arrivals.append(arrival)    # append to in_process_arrivals
 
-            elif self.clock == next_failure_server['free_operation_time']:  # if clock is freeOp time
+            elif (self.clock == next_failure_server['free_operation_time'] or self.temp_time ==
+                  next_failure_server['free_operation_time']):  # if clock is freeOp time
                 print("in next failure server")
                 self.busy_servers.remove(next_failure_server)               # remove from busy_servers
                 next_failure_server['free_operation_time'] = None           # no freeOp time for that
@@ -125,7 +134,8 @@ class MMCSimulationServerFailureTask:
                 else:                                                           # if repairman is busy
                     self.repairing_servers.append(next_failure_server)          # add failure to queue
 
-            elif next_repair is not None and 'repair_time' in next_repair and self.clock == next_repair['repair_time']:
+            elif (next_repair is not None and 'repair_time' in next_repair and self.clock == next_repair['repair_time']
+                  or self.temp_time == next_repair):
                 print("in repair finished")
                 self.repaired_server['free_operation_time'] = (
                     random.expovariate(self.ksi))                               # generate op time
@@ -140,7 +150,7 @@ class MMCSimulationServerFailureTask:
                     self.repaired_server = server                               # server is now getting repaired
 
             elif next_freed_server is not None and 'service' in next_freed_server and self.clock == \
-                    next_freed_server['service']:
+                    next_freed_server['service'] or self.temp_time == next_freed_server:
                 print("in next freed server")
 
                 arrival_server_id = next_freed_server['server_id']
@@ -152,18 +162,19 @@ class MMCSimulationServerFailureTask:
 
                 self.in_process_arrivals = [arrival for arrival in self.in_process_arrivals if arrival['server_id'] !=
                                             arrival_server_id]
+            self.temp_time = 0
         self.calculations()
 
     def calculations(self):
         # average waiting times
-        self.w_queue = sum(self.wait_list) / len(self.wait_list)
-        self.w = self.w_queue - (1 / self.lambda_rate)
+        # self.w_queue = sum(self.wait_list) / len(self.wait_list)
+        # self.w = self.w_queue - (1 / self.lambda_rate)
 
         # utilization / traffic intensity
         self.rho = self.lambda_rate / (self.c * self.mhu)
 
         # queue length calculations
-        self.l_queue = self.lambda_rate * self.w_queue
+        # self.l_queue = self.lambda_rate * self.w_queue
 
 
 lambda_rate = 0.8
