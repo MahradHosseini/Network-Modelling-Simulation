@@ -16,7 +16,7 @@ class MMCSimulation:
         self.mhu = mhu_in  # μ
         self.c = c_in  # num of servers
         self.time_limit = time_limit_in  # how long sim should take
-        self.clock = 0       # real time
+        self.clock = 0          # real time
         self.services = []      # service times
         self.servers = []       # servers
         self.arrivals = []      # arrival times
@@ -43,7 +43,6 @@ class MMCSimulation:
         self.generate_arrival_time()  # generate arrivals
         self.generate_service_time()  # generate service times
         self.clock = 0  # clock is 0
-        print("beginning clock: ", self.clock)
         while self.clock < self.time_limit and (len(self.arrivals) != 0 or len(self.servers) != 0):
             if len(self.servers) == self.c:                                 # if servers are busy
                 self.clock = min(self.servers)                                  # time is when it is free
@@ -53,7 +52,7 @@ class MMCSimulation:
                     if self.clock <= self.arrivals[0]:                              # if the time is before the arrival
                         self.clock = self.arrivals.pop(0)                           # make it new arrival's
                         self.wait_list.append(0)
-                    else:                                                       # if time is equal or later than the arrival
+                    else:                                                       # if time == or > than the arrival
                         self.wait_list.append(self.clock - self.arrivals[0])
                         self.arrivals.pop(0)                                        # just pop and do not touch time
                     service_time = self.services.pop(0)                         # service time is taken
@@ -61,11 +60,11 @@ class MMCSimulation:
                     self.servers.append(departure_time)                         # append to servers
                 else:
                     break
-            if len(self.arrivals) != 0:
-                print("next arrival: ", self.arrivals[0])
-            print("time is now: ", self.clock)
-            print("servers are: ", self.servers)
-        print("wait-list: ", self.wait_list)
+            # if len(self.arrivals) != 0:
+                # print("next arrival: ", self.arrivals[0])
+            # print("time is now: ", self.clock)
+            # print("servers are: ", self.servers)
+        # print("wait-list: ", self.wait_list)
         self.calculations()
 
     def calculations(self):
