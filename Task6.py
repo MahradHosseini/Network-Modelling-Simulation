@@ -20,6 +20,7 @@ class MMCSimulationServerFailureTask:
         self.w_queue = None
         self.w = None
 
+        self.wait_list = []  # wait times
         self.busy_servers = []  # busy servers
         self.repairing_servers = []  # servers waiting for repair
         self.repaired_server = None  # current repaired server
@@ -64,7 +65,6 @@ class MMCSimulationServerFailureTask:
         self.clock = 0                              # reset clock
         time_flag = False
         self.arrivals.pop(0)
-        # print(self.arrivals)
 
         while self.clock < self.time_limit and (len(self.arrivals) != 0 or len(self.busy_servers) != 0):
             time_flag = False
@@ -86,7 +86,6 @@ class MMCSimulationServerFailureTask:
             next_event_time = min(arrival_time, server_failure_time, repair_time, freed_server_time)
             if len(self.usable_servers )!= 0:
                 self.clock = next_event_time
-                # print("arrival, server failure, repair and free server time: ",arrival_time, server_failure_time, repair_time, freed_server_time)
             else:
                 self.clock = min(repair_time, freed_server_time, server_failure_time)
                 # print(repair_time, freed_server_time, server_failure_time)
@@ -178,27 +177,15 @@ class MMCSimulationServerFailureTask:
         self.calculations()
 
     def calculations(self):
-        # traffic intensity
+        # average waiting times
+        self.w_queue = sum(self.wait_list) / len(self.wait_list)
+        self.w = self.w_queue - (1 / self.lambda_rate)
+
+        # utilization / traffic intensity
         self.rho = self.lambda_rate / (self.c * self.mhu)
 
-        # p_0 probability system (queue + servers) is empty
-        val = 0
-        for m in range(self.c):
-            a = ((self.c * self.rho) ** m) / math.factorial(m)
-            b = ((self.c * self.rho) ** self.c) / (math.factorial(self.c) * (1 - self.rho))
-            d = a + b
-            val += d
-        self.p_0 = 1 / val
-
-        # Lq: mean number of customers in the queue
-        self.l_queue = (self.p_0 * ((self.lambda_rate / self.mhu) ** self.c) * self.rho) / (
-                math.factorial(self.c) * ((1 - self.rho) ** 2))
-
-        # average waiting time for queue
-        self.w_queue = self.l_queue / self.lambda_rate
-
-        # average waiting time
-        self.w = self.w_queue + (1 / self.mhu)
+        # queue length calculations
+        self.l_queue = self.lambda_rate * self.w_queue
 
 
 lambda_rate = 0.8
