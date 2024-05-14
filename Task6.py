@@ -65,6 +65,7 @@ class MMCSimulationServerFailureTask:
         self.usable_servers = self.servers.copy()   # all servers are usable at first
         self.clock = 0                              # reset clock
         self.arrivals.pop(0)
+        print(len(self.arrivals))
 
         while self.clock < self.time_limit and (len(self.arrivals) != 0 or len(self.busy_servers) != 0):
             next_arrival = min(self.arrivals, key=lambda x: x['time']) if self.arrivals else None
@@ -80,22 +81,18 @@ class MMCSimulationServerFailureTask:
             repair_time = next_repair['repair_time'] if next_repair is not None else math.inf
             freed_server_time = next_freed_server['service'] if next_freed_server is not None else math.inf
 
-            print("time is: ", self.clock)
 
             next_event_time = min(arrival_time, server_failure_time, repair_time, freed_server_time)
-            if len(self.usable_servers )!= 0:
-                print("clock before: ", self.clock)
+            if len(self.usable_servers) != 0:
                 if self.clock > next_event_time:
                     self.temp_time = next_event_time
                 else:
                     self.clock = next_event_time
-                print("clock after: ", self.clock)
             else:
-                print("clock before: ", self.clock)
                 self.clock = min(repair_time, freed_server_time, server_failure_time)
-                print("clock after: ", self.clock)
 
             if self.clock == arrival_time or self.temp_time == arrival_time:        # if time is next_arrival
+                print("in arrival")
                 if len(self.usable_servers) == 0:               # if no usable servers pass
                     print("no usable servers")
                     self.clock = min(repair_time, freed_server_time, server_failure_time)
@@ -111,6 +108,7 @@ class MMCSimulationServerFailureTask:
                     arrival['service'] = self.generate_service_time() + self.clock  # generated arrival service time
                     arrival['server_id'] = server['id']         # arrival's server id = server's
                     self.in_process_arrivals.append(arrival)    # append to in_process_arrivals
+                    self.wait_list.append(self.clock - arrival['time'])
 
             elif (self.clock == next_failure_server['free_operation_time'] or self.temp_time ==
                   next_failure_server['free_operation_time']):  # if clock is freeOp time
@@ -163,15 +161,18 @@ class MMCSimulationServerFailureTask:
                 self.in_process_arrivals = [arrival for arrival in self.in_process_arrivals if arrival['server_id'] !=
                                             arrival_server_id]
             self.temp_time = 0
+        print(self.clock)
         self.calculations()
 
     def calculations(self):
         # average waiting times
-        # self.w_queue = sum(self.wait_list) / len(self.wait_list)
-        # self.w = self.w_queue - (1 / self.lambda_rate)
+        self.w_queue = sum(self.wait_list) / len(self.wait_list)
+        self.w = self.w_queue + (1 / self.lambda_rate)
 
         # utilization / traffic intensity
         self.rho = self.lambda_rate / (self.c * self.mhu)
+        print(self.wait_list)
+        print(len(self.arrivals))
 
         # queue length calculations
         # self.l_queue = self.lambda_rate * self.w_queue
@@ -182,7 +183,7 @@ mhu = 1
 c = 2
 ksi_rate = 0.001
 eta_rate = 0.1
-sim_time = 1000
+sim_time = 100
 
 simulation = MMCSimulationServerFailureTask(lambda_rate, mhu, c, sim_time, ksi_rate, eta_rate)
 simulation.run_simulation()

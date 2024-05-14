@@ -70,7 +70,7 @@ class MMCSimulation:
     def calculations(self):
         # average waiting times
         self.w_queue = sum(self.wait_list)/len(self.wait_list)
-        self.w = self.w_queue - (1/self.lambda_rate)
+        self.w = self.w_queue + (1/self.lambda_rate)
 
         # utilization / traffic intensity
         self.rho = self.lambda_rate / (self.c * self.mhu)
