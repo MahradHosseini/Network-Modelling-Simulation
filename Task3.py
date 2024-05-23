@@ -9,10 +9,9 @@ arrival and service rates λ and µ, respectively.
 '''
 
 
-def mmc_queue_analytics(lambda_rate, mhu , c_value):
+def mmc_queue_analytics(lambda_rate, mhu, c_value):
     if lambda_rate >= mu_rate:
         raise ValueError("The system is unstable, use a λ < µ")
-    # µ mhu: mean service rate = 1 / E[Service - Time]
 
     # traffic intensity
     p = lambda_rate / (c_value * mhu)
@@ -39,7 +38,8 @@ def mmc_queue_analytics(lambda_rate, mhu , c_value):
         'Utilization (ρ)': p,
         'Mean queue length': l_queue,
         'Average Response Time in the System (W)': w,
-        'Average Waiting Time in the Queue (Wq)': w_queue
+        'Average Waiting Time in the Queue (Wq)': w_queue,
+        'Throughput (λ)': lambda_rate
     }
 
 

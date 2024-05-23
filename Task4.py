@@ -26,10 +26,13 @@ class MMCSimulation:
         self.l_queue = None
         self.w_queue = None
         self.w = None
+        self.mean_arrival_time = None
+        self.mean_service_time = None
 
     def generate_service_time(self):
         for _ in range(len(self.arrivals)):
             self.services.append(random.expovariate(self.mhu))
+        self.mean_service_time = sum(self.services)/len(self.services)
 
     def generate_arrival_time(self):
         while self.clock < self.time_limit:
@@ -38,12 +41,14 @@ class MMCSimulation:
                 break
             self.arrivals.append(arrival_time)
             self.clock = arrival_time
+        self.mean_arrival_time = sum(self.arrivals)/len(self.arrivals)
 
     def run_simulation(self):
         self.generate_arrival_time()  # generate arrivals
         self.generate_service_time()  # generate service times
         self.clock = 0  # clock is 0
-        while self.clock < self.time_limit and (len(self.arrivals) != 0 or len(self.servers) != 0):
+        # while time limit isn't passed or (arrivals are not done or servers are not empty)
+        while self.clock < self.time_limit or (len(self.arrivals) != 0 or len(self.servers) != 0):
             if len(self.servers) == self.c:                                 # if servers are busy
                 self.clock = min(self.servers)                                  # time is when it is free
                 self.servers.remove(min(self.servers))                          # remove server from busy
@@ -60,21 +65,20 @@ class MMCSimulation:
                     self.servers.append(departure_time)                         # append to servers
                 else:
                     break
-            # if len(self.arrivals) != 0:
-                # print("next arrival: ", self.arrivals[0])
-            # print("time is now: ", self.clock)
-            # print("servers are: ", self.servers)
-        # print("wait-list: ", self.wait_list)
         self.calculations()
 
     def calculations(self):
         # average waiting times
         self.w_queue = sum(self.wait_list)/len(self.wait_list)
-        self.w = self.w_queue + (1/self.lambda_rate)
-
+        # average waiting time for those who wait
+        self.wait_list = [value for value in self.wait_list if value != 0.0]
+        self.w = sum(self.wait_list)/len(self.wait_list)
+        # new lambda
+        self.lambda_rate = 1/self.mean_arrival_time
+        # new mhu
+        self.mhu = 1/self.mean_service_time
         # utilization / traffic intensity
         self.rho = self.lambda_rate / (self.c * self.mhu)
-
         # queue length calculations
         self.l_queue = self.lambda_rate*self.w_queue
 
@@ -85,7 +89,10 @@ sim_time = 1000
 
 simulation = MMCSimulation(lambda_rate, mhu, c, sim_time)
 simulation.run_simulation()
-print("Utilization (ρ)", simulation.rho)
-print("Mean queue length", simulation.l_queue)
-print("Average Response Time in the System (W):", simulation.w)
-print("Average waiting time for queue:", simulation.w_queue)
+print("Utilization (ρ): ", simulation.rho)
+print("lambda (λ): ", simulation.lambda_rate)
+print("mhu (μ): ", simulation.mhu)
+print("Mean Service Time: ", simulation.mean_service_time)
+print("Mean queue length: ", simulation.l_queue)
+print("Mean Waiting Time for Those Who Wait: ", simulation.w)
+print("Mean Waiting Time: ", simulation.w_queue)

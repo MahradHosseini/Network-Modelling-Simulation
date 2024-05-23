@@ -37,9 +37,15 @@ class MMCSimulationServerFailureTask:
                          'repair_time': None,
                          'id': i}
                         for i in range(self.c)]
+        self.mean_arrival_time = None
+        self.mean_service_time = 0
+        self.num_of_service_times = 0
 
     def generate_service_time(self):
-        return random.expovariate(self.mhu) + self.clock  # generate a single service time
+        value = random.expovariate(self.mhu) + self.clock  # generate a single service time
+        self.mean_service_time = self.mean_service_time + value
+        self.num_of_service_times = self.num_of_service_times + 1
+        return value
 
     def generate_arrival_time(self):
         i = 0                                                                   # index for the arrivals
@@ -167,15 +173,19 @@ class MMCSimulationServerFailureTask:
     def calculations(self):
         # average waiting times
         self.w_queue = sum(self.wait_list) / len(self.wait_list)
-        self.w = self.w_queue + (1 / self.lambda_rate)
-
+        # average waiting time for those who wait
+        self.wait_list = [value for value in self.wait_list if value != 0.0]
+        self.w = sum(self.wait_list) / len(self.wait_list)
+        # new lambda
+        self.lambda_rate = 1 / self.mean_arrival_time
+        # mean service time
+        self.mean_service_time = self.mean_service_time / self.num_of_service_times
+        # new mhu
+        self.mhu = 1 / self.mean_service_time
         # utilization / traffic intensity
         self.rho = self.lambda_rate / (self.c * self.mhu)
-        print(self.wait_list)
-        print(len(self.arrivals))
-
         # queue length calculations
-        # self.l_queue = self.lambda_rate * self.w_queue
+        self.l_queue = self.lambda_rate * self.w_queues
 
 
 lambda_rate = 0.8
@@ -183,11 +193,14 @@ mhu = 1
 c = 2
 ksi_rate = 0.001
 eta_rate = 0.1
-sim_time = 10
+sim_time = 100
 
 simulation = MMCSimulationServerFailureTask(lambda_rate, mhu, c, sim_time, ksi_rate, eta_rate)
 simulation.run_simulation()
-print("Utilization (ρ)", simulation.rho)
-print("Mean queue length", simulation.l_queue)
-print("Average Response Time in the System (W):", simulation.w)
-print("Average waiting time for queue:", simulation.w_queue)
+print("Utilization (ρ): ", simulation.rho)
+print("lambda (λ): ", simulation.lambda_rate)
+print("mhu (μ): ", simulation.mhu)
+print("Mean Service Time: ", simulation.mean_service_time)
+print("Mean queue length: ", simulation.l_queue)
+print("Mean Waiting Time for Those Who Wait: ", simulation.w)
+print("Mean Waiting Time: ", simulation.w_queue)
