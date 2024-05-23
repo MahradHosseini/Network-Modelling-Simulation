@@ -42,8 +42,9 @@ class MMCSimulationServerFailureTask:
         self.num_of_service_times = 0
 
     def generate_service_time(self):
-        value = random.expovariate(self.mhu) + self.clock  # generate a single service time
+        value = random.expovariate(self.mhu)  # generate a single service time
         self.mean_service_time = self.mean_service_time + value
+        value = value + self.clock
         self.num_of_service_times = self.num_of_service_times + 1
         return value
 
@@ -51,7 +52,7 @@ class MMCSimulationServerFailureTask:
         i = 0                                                                   # index for the arrivals
         time_index = 0                                                          # time tracking
         while time_index < self.time_limit:                                     # while time limit isn't crossed
-            arrival_time = time_index + random.expovariate(self.lambda_rate)    # arrival time is now + random
+            arrival_time = random.expovariate(self.lambda_rate)    # arrival time is now + random
             if arrival_time > self.time_limit:                                  # if arrival time is greater than limit
                 break                                                           # leave
             self.arrivals.append({'time': arrival_time,
@@ -60,6 +61,8 @@ class MMCSimulationServerFailureTask:
                                   'server_id': None})                           # append the new arrival
             time_index = arrival_time                                           # time index is the arrival of new
             i = i+1                                                             # index for arrival ++
+        self.arrivals.sort(key=lambda x: x['time'])
+        print(self.arrivals)
 
     def print_arrivals(self):
         for arrival in self.arrivals:
@@ -193,7 +196,7 @@ mhu = 1
 c = 2
 ksi_rate = 0.001
 eta_rate = 0.1
-sim_time = 100
+sim_time = 10
 
 simulation = MMCSimulationServerFailureTask(lambda_rate, mhu, c, sim_time, ksi_rate, eta_rate)
 simulation.run_simulation()

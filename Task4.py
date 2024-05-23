@@ -36,7 +36,7 @@ class MMCSimulation:
 
     def generate_arrival_time(self):
         while self.clock < self.time_limit:
-            arrival_time = self.clock + random.expovariate(self.lambda_rate)
+            arrival_time = random.expovariate(self.lambda_rate)
             if arrival_time > self.time_limit:
                 break
             self.arrivals.append(arrival_time)
@@ -85,7 +85,7 @@ class MMCSimulation:
 lambda_rate = 0.8
 mhu = 1
 c = 2
-sim_time = 1000
+sim_time = 10
 
 simulation = MMCSimulation(lambda_rate, mhu, c, sim_time)
 simulation.run_simulation()
