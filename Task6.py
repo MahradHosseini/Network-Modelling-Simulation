@@ -49,7 +49,7 @@ class MMCSimulationServerFailureTask:
         i = 0  # index for the arrivals
         time_index = 0  # time tracking
         while time_index < self.time_limit:  # while time limit isn't crossed
-            arrival_time = random.expovariate(self.lambda_rate) + time_index  # arrival time is now + random
+            arrival_time = random.expovariate(self.lambda_rate)  # arrival time is random
             if arrival_time > self.time_limit:  # if arrival time is greater than limit
                 break  # leave
             self.arrivals.append({'time': arrival_time,
@@ -205,7 +205,7 @@ mhu = 1
 c = 2
 ksi_rate = 0.001
 eta_rate = 0.1
-sim_time = 1000
+sim_time = 10
 
 simulation = MMCSimulationServerFailureTask(lambda_rate, mhu, c, sim_time, ksi_rate, eta_rate)
 simulation.run_simulation()
