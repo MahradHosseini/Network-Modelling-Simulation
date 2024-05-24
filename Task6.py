@@ -107,7 +107,6 @@ class MMCSimulationServerFailureTask:
                 self.clock = min(repair_time, freed_server_time, server_failure_time)
 
             if self.clock == arrival_time or self.temp_time == arrival_time:  # if time is next_arrival
-                print("in arrival")
                 if len(self.usable_servers) == 0:  # if no usable servers pass
                     print("no usable servers")
                     self.clock = min(repair_time, freed_server_time, server_failure_time)
@@ -166,7 +165,6 @@ class MMCSimulationServerFailureTask:
 
             elif next_freed_server is not None and 'service' in next_freed_server and self.clock == \
                     next_freed_server['service'] or self.temp_time == next_freed_server:
-                print("in next freed server")
 
                 arrival_server_id = next_freed_server['server_id']
                 matching_server = next((server for server in self.busy_servers if server['id'] == arrival_server_id),
@@ -178,7 +176,6 @@ class MMCSimulationServerFailureTask:
                 self.in_process_arrivals = [arrival for arrival in self.in_process_arrivals if arrival['server_id'] !=
                                             arrival_server_id]
             self.temp_time = 0
-            print(self.wait_list)
         self.calculations()
 
     def calculations(self):
