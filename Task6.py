@@ -122,12 +122,13 @@ class MMCSimulationServerFailureTask:
                                         == next_failure_server['id']]
                 index_val = next((index for index, arrival in enumerate(self.in_process_arrivals)
                                   if arrival['server_id'] == next_failure_server['id']), None)
-                # new service time of the arrival is remaining now
-                self.in_process_arrivals[index_val]['service'] = (
-                        self.clock - self.in_process_arrivals[index_val]['time'])
-                self.in_process_arrivals[index_val]['server_id'] = None         # arrival's server_id is None
-                self.in_process_arrivals[index_val]['time'] = self.clock        # arrival time is clock
-                self.arrivals.append(self.in_process_arrivals.pop(index_val))   # pop and append to arrivals
+                if index_val is not None:
+                    # new service time of the arrival is remaining now
+                    self.in_process_arrivals[index_val]['service'] = (
+                            self.clock - self.in_process_arrivals[index_val]['time'])
+                    self.in_process_arrivals[index_val]['server_id'] = None         # arrival's server_id is None
+                    self.in_process_arrivals[index_val]['time'] = self.clock        # arrival time is clock
+                    self.arrivals.append(self.in_process_arrivals.pop(index_val))   # pop and append to arrivals
                 if not self.repairman['is_busy']:                               # if repairman is free
                     self.repairman['is_busy'] = True                            # now busy
                     self.repairman['server_id'] = next_failure_server['id']     # repairman's server_id is id
