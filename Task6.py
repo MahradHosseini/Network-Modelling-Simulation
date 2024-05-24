@@ -37,7 +37,7 @@ class MMCSimulationServerFailureTask:
                          'repair_time': None,
                          'id': i}
                         for i in range(self.c)]
-        self.mean_arrival_time = None
+        self.mean_arrival_time = 0
         self.mean_service_time = 0
         self.num_of_service_times = 0
 
@@ -62,6 +62,10 @@ class MMCSimulationServerFailureTask:
             i += 1                                                              # index for arrival ++
         self.arrivals.sort(key=lambda x: x['time'])
 
+        total_time = sum(arrival['time'] for arrival in self.arrivals)
+        count = len(self.arrivals)
+        self.mean_arrival_time = total_time / count
+
     def print_arrivals(self):
         for arrival in self.arrivals:
             print("process arrival: ", arrival['time'])
@@ -73,7 +77,7 @@ class MMCSimulationServerFailureTask:
         self.clock = 0                              # reset clock
         self.arrivals.pop(0)                        # remove initial dummy arrival
 
-        while self.clock < self.time_limit or (self.arrivals or self.busy_servers or self.repairing_servers):
+        while self.clock < self.time_limit and (self.arrivals or self.busy_servers or self.repairing_servers):
             next_arrival = min(self.arrivals, key=lambda x: x['time']) if self.arrivals else None
             filtered_busy_servers = [server for server in self.busy_servers if server['free_operation_time'] is not None]
             next_failure_server = min(filtered_busy_servers, key=lambda x: x['free_operation_time']) if filtered_busy_servers else None
@@ -174,7 +178,8 @@ class MMCSimulationServerFailureTask:
         self.w_queue = sum(self.wait_list) / len(self.wait_list)
         # average waiting time for those who wait
         self.wait_list = [value for value in self.wait_list if value != 0.0]
-        self.w = sum(self.wait_list) / len(self.wait_list)
+        if len(self.wait_list) != 0:
+            self.w = sum(self.wait_list) / len(self.wait_list)
         # new lambda
         self.lambda_rate = 1 / self.mean_arrival_time
         # mean service time
@@ -184,7 +189,7 @@ class MMCSimulationServerFailureTask:
         # utilization / traffic intensity
         self.rho = self.lambda_rate / (self.c * self.mhu)
         # queue length calculations
-        self.l_queue = self.lambda_rate * self.w_queues
+        self.l_queue = self.lambda_rate * self.w_queue
 
 
 lambda_rate = 0.8
