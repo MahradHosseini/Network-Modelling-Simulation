@@ -75,7 +75,8 @@ class MMCSimulationServerFailureTask:
 
         while self.clock < self.time_limit or (self.arrivals or self.busy_servers or self.repairing_servers):
             next_arrival = min(self.arrivals, key=lambda x: x['time']) if self.arrivals else None
-            next_failure_server = min(self.busy_servers, key=lambda x: x['free_operation_time']) if self.busy_servers else None
+            filtered_busy_servers = [server for server in self.busy_servers if server['free_operation_time'] is not None]
+            next_failure_server = min(filtered_busy_servers, key=lambda x: x['free_operation_time']) if filtered_busy_servers else None
             next_repair = self.repaired_server if self.repaired_server else None
             next_freed_server = min(self.in_process_arrivals, key=lambda x: x['service']) if self.in_process_arrivals else None
 
